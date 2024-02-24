@@ -4,12 +4,8 @@ import {
   ShoppingCartIcon,
   TagIcon,
   RectangleGroupIcon,
-
-  XMarkIcon,
   StarIcon
 } from '@heroicons/react/24/solid'
-import { Dialog, Transition } from '@headlessui/react';
-import { Fragment, useState } from 'react';
 import Market from '../../../assets/Market.png'
 import Menu from './Menu';
 
@@ -28,7 +24,7 @@ export interface INavigation {
 
 
 const Sidebar = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+
 
   const navigation: INavigation[] = [
     {
