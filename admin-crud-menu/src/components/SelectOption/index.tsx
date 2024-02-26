@@ -5,27 +5,29 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 interface Props {
   options: ISelectOption[]
-  className?: string
-  isSearchable?: boolean | false
-  onChange?: (selected: ISelectOption | null) => void
-  defaultValue?: ISelectOption
+  onChange?: (selectedOption: ISelectOption | null) => void;
+  selectOption?: ISelectOption
+  setSelectOption?: React.Dispatch<React.SetStateAction<ISelectOption >>
+  defaultValue?: string
   placeHolder?: string
 }
 
-const SelectOption: React.FC<Props> = ({ defaultValue, options, onChange, isSearchable, className }) => {
-  const handleChange = (event: SelectChangeEvent<ISelectOption>) => {
-    onChange?.(event.target.value as ISelectOption); 
+const SelectOption: React.FC<Props> = ({ defaultValue, options, onChange, setSelectOption, selectOption }) => {
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    const selectedValue = event.target.value as string;
+    const selectedOption = options.find(option => option.value === selectedValue) || null;
+    setSelectOption!(selectedOption!);
   };
 
   return (
     <>
       <Select
-        value={defaultValue}
+        value={selectOption ? selectOption.value : ''}
         onChange={handleChange}
         style={{ width: '200px', color: 'black' }} 
       >
         {options.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
+          <MenuItem key={option.key} value={option.value}>
             {option.label}
           </MenuItem>
         ))}

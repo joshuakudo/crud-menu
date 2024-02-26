@@ -64,8 +64,6 @@ const Header: React.FC<IProps> = ({ search, className, isLastPage, callback, set
               <p className="md:mt-0 lg:ml-10 text-gray-500 text-lg pr-2">Filter By:</p>
             </div>
             <SelectOption
-              className="w-full md:w-72 md:pr-2 relative "
-              isSearchable={false}
               options={filterBy!}
             />
           </div>
