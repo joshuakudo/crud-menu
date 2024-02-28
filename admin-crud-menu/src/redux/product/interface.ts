@@ -5,15 +5,18 @@ export interface ISelectOption {
 }
 
 export interface Product {
-  productId: string
+  key: string
   name: string
   category: string
   description: string
   stocksLeft: number
   cost: number
   price: number
-  smallStocks: number
-  mediumStocks: number
-  largeStocks: number
+  smallStocks?: number
+  mediumStocks?: number
+  largeStocks?: number
+  stocks128gbStorage?: number
+  stocks256gbStorage?: number
+  stocks1tbStorage?: number
   files: string
 }

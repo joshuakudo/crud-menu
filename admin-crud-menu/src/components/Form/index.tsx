@@ -6,21 +6,25 @@ import { PhotoIcon, XCircleIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { useDispatch } from "react-redux";
 import { FileRejection, useDropzone } from "react-dropzone";
 import SelectOption from "../SelectOption";
-import { addProductRequest } from "../../redux/product/action";
-import { useAddProductSuccess } from "hooks/product";
+import { addProductRequest, updateProductRequest } from "../../redux/product/action";
+import { useAddProductSuccess, useProduct } from "hooks/product";
 import { ISelectOption } from "interface/common";
 import {
   getDownloadURL,
   getStorage,
-  listAll,
   ref,
   uploadBytes,
 } from "firebase/storage";
 import app from "firebaseInit";
 import { v4 as uuidv4 } from "uuid";
+import { toast } from "react-toastify";
+import { SuccessToast } from "components/Toastify";
+import { Modal } from "@mui/material";
+import { CheckIcon } from "@heroicons/react/24/outline";
 
 interface IProps {
   open: boolean;
+  isUpdate?: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -36,10 +40,10 @@ export const FilterOptions = [
   { key: 8, value: "Fruit", label: "Fruits" },
   { key: 9, value: "Condiment", label: "Condiments" },
   { key: 10, value: "Meat", label: "Meat" },
-  { key: 11, value: "Others", label: "Others" },
+  { key: 11, value: "Other", label: "Other" },
 ];
 
-const AddModalForm: React.FC<IProps> = ({ open, setOpen }) => {
+const AddModalForm: React.FC<IProps> = ({ open, setOpen, isUpdate }) => {
   const dispatch = useDispatch();
   const addProductSuccess = useAddProductSuccess();
   const [fileValue, setFileValue] = useState<File[]>();
@@ -48,6 +52,10 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen }) => {
   const [disable, setDisable] = useState<boolean>(false);
   const [imgUrl, setImgUrl] = useState<string[]>([]);
   const [image, setImage] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+  const [uploadDisable, setUploadDisable] = useState<boolean>(false)
+
+  const product = useProduct()
 
   const imageDB = getStorage(app);
 
@@ -74,19 +82,24 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen }) => {
 
   const removeFile = () => {
     setImagePreview(undefined);
+    setUploadDisable(false)
+    setMessage("")
   };
 
   const initialValues = {
-    name: "",
-    category: "",
-    description: "",
-    stocksLeft: 0,
-    cost: 0,
-    price: 0,
-    smallStocks: 0,
-    mediumStocks: 0,
-    largeStocks: 0,
-    files: "",
+    name: isUpdate ? product.name : "",
+    category: isUpdate ? product.category : "",
+    description: isUpdate ? product.description : "",
+    stocksLeft: isUpdate ? product.stocksLeft : 0,
+    cost: isUpdate ? product.cost : 0,
+    price: isUpdate ? product.price : 0,
+    stocks128gbStorage: isUpdate ? product.stocks128gbStorage :0,
+    stocks256gbStorage: isUpdate ? product.stocks256gbStorage :0,
+    stocks1tbStorage: isUpdate ? product.stocks1tbStorage :0,
+    smallStocks: isUpdate ? product.smallStocks :0,
+    mediumStocks: isUpdate ? product.mediumStocks : 0,
+    largeStocks: isUpdate ? product.largeStocks :0,
+    files: isUpdate ? product.files : undefined,
   };
 
   const handleUpload = async () => {
@@ -101,6 +114,8 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen }) => {
         setImage(url); // Update the image state with the latest URL
         setDisable(false);
 
+        setMessage("Upload Successfully!")
+        setUploadDisable(true)
         return url; // Return the URL
       }
 
@@ -117,23 +132,49 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen }) => {
     console.log(values);
     console.log('image', image)
     try {
-      if (image) {
-        dispatch(
-          addProductRequest({
-            name: values.name,
-            category: selectOption?.value,
-            description: values.description,
-            stocksLeft: values.stocksLeft,
-            cost: values.cost,
-            price: values.price,
-            smallStocks: values.smallStocks,
-            mediumStocks: values.mediumStocks,
-            largeStocks: values.largeStocks,
-            files: image,
-          })
-        );
+      if(isUpdate) {
+        const updateFields = {
+          name: values.name,
+          category: selectOption?.value,
+          description: values.description,
+          stocksLeft: values.stocksLeft,
+          cost: values.cost,
+          price: values.price,
+          smallStocks: values.smallStocks,
+          mediumStocks: values.mediumStocks,
+          largeStocks: values.largeStocks,
+          stocks128gbStorage: values.stocks128gbStorage,
+          stocks256gbStorage: values.stocks256gbStorage,
+          stocks1tbStorage: values.stocks1tbStorage,
+          files: image === "" ? product.files : image,
+        }
+        dispatch(updateProductRequest({
+          key: product.key,
+          updatedFields: updateFields
+        }))
+      } else {
+        if (image) {
+          dispatch(
+            addProductRequest({
+              name: values.name,
+              category: selectOption?.value,
+              description: values.description,
+              stocksLeft: values.stocksLeft,
+              cost: values.cost,
+              price: values.price,
+              smallStocks: values.smallStocks,
+              mediumStocks: values.mediumStocks,
+              largeStocks: values.largeStocks,
+              stocks128gbStorage: values.stocks128gbStorage,
+              stocks256gbStorage: values.stocks256gbStorage,
+              stocks1tbStorage: values.stocks1tbStorage,
+              files: image,
+            })
+          );
+        }
+  
       }
-
+      
       if (addProductSuccess) {
         setOpen(false);
       }
@@ -184,6 +225,7 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen }) => {
   };
 
   return (
+    <>
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={setOpen}>
         <Transition.Child
@@ -272,7 +314,7 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen }) => {
                               </label>
                               <div className="mt-1">
                                 <SelectOption
-                                  defaultValue="s"
+                                  defaultValue="Others"
                                   selectOption={selectOption}
                                   setSelectOption={setSelectOption}
                                   onChange={(selectedOption) =>
@@ -320,14 +362,14 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen }) => {
                                 htmlFor="stocksLeft"
                                 className="block text-lg font-medium text-black"
                               >
-                                Stocks Left
+                                Total Stocks Left
                               </label>
                               <div className="mb-4 w-full">
                                 <Field
                                   type="number"
                                   name="stocksLeft"
                                   id="stocksLeft"
-                                  className="block w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-emerald-900 focus:ring-emerald-900 sm:text-lg"
+                                  className="block pl-3 w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-emerald-900 focus:ring-emerald-900 sm:text-lg"
                                   placeholder="Enter the total stocks left..."
                                 />
                                 <ErrorMessage
@@ -341,44 +383,44 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen }) => {
                             <div className="flex">
                               <div className="mb-4 mr-4">
                                 <label
-                                  htmlFor="smallStocks"
+                                  htmlFor={selectOption?.value === "Gadget" ? "stocks128gbStorage" : "smallStocks"}
                                   className="block text-lg font-medium text-black"
                                 >
-                                  Small Size Stocks
+                                  {selectOption?.value === "Gadget" ? "Stocks of 128GB Storage" : "Small Size Stocks"}
                                 </label>
                                 <div className="mt-1 w-full relative">
                                   <Field
                                     type="number"
-                                    name="smallStocks"
-                                    id="smallStocks"
-                                    className="block w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-emerald-900 focus:ring-emerald-900 sm:text-lg"
+                                    name={selectOption?.value === "Gadget" ? "stocks128gbStorage" : "smallStocks"}
+                                    id={selectOption?.value === "Gadget" ? "stocks128gbStorage" : "smallStocks"}
+                                    className="block pl-3 w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-emerald-900 focus:ring-emerald-900 sm:text-lg"
                                     placeholder="Enter the stocks amount..."
                                   />
                                   <ErrorMessage
-                                    name="smallStocks"
+                                    name={selectOption?.value === "Gadget" ? "stocks128gbStorage" : "smallStocks"}
                                     component="div"
-                                    className="mt-1 pl-3 block text-sm font-bold text-red-500"
+                                    className="mt-1 block text-sm font-bold text-red-500"
                                   />
                                 </div>
                               </div>
 
                               <div className="mb-4 mr-4">
                                 <label
-                                  htmlFor="mediumStocks"
+                                  htmlFor={selectOption?.value === "Gadget" ? "stocks256gbStorage" : "mediumStocks"}
                                   className="block text-lg font-medium text-black"
                                 >
-                                  Medium Size Stocks
+                                  {selectOption?.value === "Gadget" ? "Stocks of 256GB Storage" : "Medium Size Stocks"}
                                 </label>
                                 <div className="mt-1 w-full relative">
                                   <Field
                                     type="number"
-                                    name="mediumStocks"
-                                    id="mediumStocks"
+                                    name={selectOption?.value === "Gadget" ? "stocks256gbStorage" : "mediumStocks"}
+                                    id={selectOption?.value === "Gadget" ? "stocks256gbStorage" : "mediumStocks"}
                                     className="block pl-3 w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-emerald-900 focus:ring-emerald-900 sm:text-lg"
                                     placeholder="Enter the stocks amount..."
                                   />
                                   <ErrorMessage
-                                    name="mediumStocks"
+                                    name={selectOption?.value === "Gadget" ? "stocks256gbStorage" : "mediumStocks"}
                                     component="div"
                                     className="mt-1 block text-sm font-bold text-red-500"
                                   />
@@ -387,21 +429,22 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen }) => {
 
                               <div className="mb-4">
                                 <label
-                                  htmlFor="largeStocks"
+                                  htmlFor={selectOption?.value === "Gadget" ? "stocks1tbStorage" : "largeStocks"}
                                   className="block text-lg font-medium text-black"
                                 >
-                                  Large Size Stocks
+                                  {selectOption?.value === "Gadget" ? "Stocks of 1TB Storage" : "Large Size Stocks"}
+                                  
                                 </label>
                                 <div className="mt-1 w-full relative">
                                   <Field
                                     type="number"
-                                    name="largeStocks"
-                                    id="largeStocks"
+                                    name={selectOption?.value === "Gadget" ? "stocks1tbStorage" : "largeStocks"}
+                                    id={selectOption?.value === "Gadget" ? "stocks1tbStorage" : "largeStocks"}
                                     className="block w-full pl-3 h-10 rounded-md border-gray-300 shadow-sm focus:border-emerald-900 focus:ring-emerald-900 sm:text-lg"
                                     placeholder="Enter the stocks amount..."
                                   />
                                   <ErrorMessage
-                                    name="largeStocks"
+                                    name={selectOption?.value === "Gadget" ? "stocks1tbStorage" : "largeStocks"}
                                     component="div"
                                     className="mt-1 block text-sm font-bold text-red-500"
                                   />
@@ -469,13 +512,14 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen }) => {
                                 >
                                   Product photo
                                 </label>
-                                {imagePreview !== undefined ? (
+                                {imagePreview !== undefined || isUpdate ? (
                                   <div className="relative">
                                     <div className="mt-5">
-                                      <img src={imagePreview!} alt="Product" />
+                                      <img src={isUpdate ? product.files : imagePreview} alt="Product" />
                                     </div>
                                     <div className="z-10 mt-5 ">
                                       <button
+                                      disabled={uploadDisable}
                                         type="button"
                                         onClick={handleUpload}
                                         className="rounded-md bg-white/10 border border-emerald-900 px-3 py-2 text-md font-semibold text-black shadow-sm hover:bg-white/20"
@@ -483,6 +527,20 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen }) => {
                                         Upload
                                       </button>
                                     </div>
+
+                                    <div className="mt-5 text-lg flex ">
+                                      {
+                                        message !== ''
+                                        ? 
+                                        <>
+                                        <CheckIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
+                                        {message}
+                                        </> 
+                                        : ""
+                                      }
+                                    
+                                      </div>
+
                                     <div className="z-10 absolute top-2 right-3 h-9 w-9">
                                       <XCircleIcon
                                         onClick={removeFile}
@@ -544,6 +602,7 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen }) => {
         </div>
       </Dialog>
     </Transition.Root>
+    </>
   );
 };
 

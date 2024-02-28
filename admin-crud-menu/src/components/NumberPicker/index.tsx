@@ -1,16 +1,24 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
-const NumberPicker = () => {
-  const [count, setCount] = useState<number>(0)
+interface IProps {
+  stocks: number
+  count: number
+  setCount: React.Dispatch<React.SetStateAction<number>>;
+}
+
+const NumberPicker: React.FC<IProps> = ({stocks, count, setCount}) => {
 
   const increment = () => {
     setCount(count + 1);
   };
 
   const decrement = () => {
-    // Prevent setting count below 0
     setCount(Math.max(0, count - 1));
   };
+
+  useEffect(() => {
+    setCount(stocks);
+  }, [stocks]);
 
   return (
     <div>

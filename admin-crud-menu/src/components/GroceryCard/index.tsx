@@ -4,16 +4,20 @@ import { useNavigate } from "react-router-dom";
 import GroceryCardDetails from "../GroceryCardDetails";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { Product } from "redux/product/interface";
+import { useDispatch } from "react-redux";
+import { getProductDetailsRequest } from "../../redux/product/action";
 
 interface IProps {
-  item: Product;
+  item: Product | null;
 }
 
 const Card: React.FC<IProps> = ({item}) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const dispatch = useDispatch()
 
   const handleClick = () => {
+    dispatch(getProductDetailsRequest(item?.key!))
     setOpen(true);
   };
 
@@ -23,11 +27,12 @@ const Card: React.FC<IProps> = ({item}) => {
 
   return (
     <div>
-      <div className="relative flex w-full max-w-[26rem] flex-col rounded-xl bg-white bg-clip-border text-gray-700 shadow-lg">
+      <div className="relative h-[29rem] flex w-full max-w-[26rem] flex-col rounded-xl bg-white bg-clip-border text-gray-700 shadow-lg">
         <div className="relative mx-4 mt-4 overflow-hidden text-white shadow-lg rounded-xl bg-blue-gray-500 bg-clip-border shadow-blue-gray-500/40">
           <img
             src={item?.files}
             alt="ui/ux review check"
+            className="w-full h-44 object-center object-contain"
           />
           <div className="absolute inset-0 w-full h-full to-bg-black-10 bg-gradient-to-tr from-transparent via-transparent to-black/60"></div>
         </div>
@@ -46,13 +51,15 @@ const Card: React.FC<IProps> = ({item}) => {
           </p>
         </div>
         <div className="p-6 pt-3">
+          <div className="flex bottom-5 inset-x-auto">
           <button
-            className="block w-full select-none rounded-lg bg-emerald-900 py-3.5 px-7 text-center align-middle font-sans text-sm font-bold uppercase text-white shadow-md shadow-gray-900/10 transition-all hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            className="block w-full select-none rounded-lg bg-emerald-900 py-3.5 px-10 text-center align-middle font-sans text-sm font-bold uppercase text-white shadow-md shadow-gray-900/10 transition-all hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
             onClick={handleClick}
             type="button"
           >
             View Details
           </button>
+          </div>
 
           <Transition show={open} as={Fragment}>
             <Dialog
@@ -74,7 +81,7 @@ const Card: React.FC<IProps> = ({item}) => {
                 >
                   <div className="bg-white rounded-lg m-10">
                     {/* ... rest of your card content */}
-                    {open && <GroceryCardDetails />}
+                    {open && <GroceryCardDetails setOpen={setOpen}/>}
                   </div>
                 </Transition.Child>
               </div>

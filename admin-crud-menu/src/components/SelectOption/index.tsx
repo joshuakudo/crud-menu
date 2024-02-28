@@ -22,6 +22,7 @@ const SelectOption: React.FC<Props> = ({ defaultValue, options, onChange, setSel
   return (
     <>
       <Select
+        key={selectOption?.key}
         value={selectOption ? selectOption.value : ''}
         onChange={handleChange}
         style={{ width: '200px', color: 'black' }} 

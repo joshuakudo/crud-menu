@@ -1,28 +1,31 @@
-import React from 'react'
-import { Route, Routes } from 'react-router-dom'
-import PrimaryLayout from '../components/Layout'
-import Dashboard from '../pages/Dashboard'
-import ComingSoon from '../components/ComingSoon'
-import GroceryCardDetails from '../components/GroceryCardDetails'
+import React from "react";
+import { Route, Routes } from "react-router-dom";
+import PrimaryLayout from "../components/Layout";
+import Product from "../pages/Product";
+import ComingSoon from "../components/ComingSoon";
+import Signin from "pages/Auth";
+import Signup from "pages/Signup";
+import PrivateRoute from "./PrivateRoute";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route element={<PrimaryLayout />}>
-        <Route index element={<Dashboard />} />
-        <Route index path='/dashboard' element={<Dashboard />} />
-        <Route index path='/product' element={<Dashboard />} />
-        
-        <Route index path='/item/details' element={<GroceryCardDetails />} />
+      <Route index element={<Signin />} />
+      <Route index path="/signup" element={<Signup />} />
 
-        <Route index path='/analytics' element={<ComingSoon />} />
-        <Route index path='/sale' element={<ComingSoon />} />
-        <Route index path='/review' element={<ComingSoon />} />
-        <Route index path='/chat' element={<ComingSoon />} />
+      <Route element={<PrivateRoute />}>
+        <Route element={<PrimaryLayout />}>
+          <Route index path="/dashboard" element={<ComingSoon />} />
+          <Route index path="/product" element={<Product />} />
 
+          <Route index path="/analytics" element={<ComingSoon />} />
+          <Route index path="/sale" element={<ComingSoon />} />
+          <Route index path="/review" element={<ComingSoon />} />
+          <Route index path="/chat" element={<ComingSoon />} />
+        </Route>
       </Route>
     </Routes>
-  )
-}
+  );
+};
 
-export default AppRoutes
+export default AppRoutes;

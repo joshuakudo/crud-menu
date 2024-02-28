@@ -4,17 +4,18 @@ import AppRoutes from './router';
 
 function App() {
   return (
-    <div className="App">
+    <div>
       <AppRoutes/>
       <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar
-        newestOnTop={true}
-        closeOnClick={false}
-        pauseOnFocusLoss={false}
-        draggable={false}
-      />
+          toastClassName="rounded-lg bg-black bottom-[6rem]"
+          position="bottom-center"
+          autoClose={3000}
+          hideProgressBar
+          newestOnTop={true}
+          closeOnClick={false}
+          pauseOnFocusLoss={false}
+          draggable={false}
+        />
     </div>
   );
 }

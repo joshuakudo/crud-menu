@@ -1,7 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 interface IProps {
   title: string
@@ -61,7 +61,12 @@ const Modal: React.FC<IProps> = ({ title, message, image, callback, open, button
                     }
 
                     <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full ">
-                      <img src={image} className="" alt="" />
+                      {
+                        image !== ''
+                        ? <img src={image} className="" alt="" />
+                        : <CheckIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
+                      }
+                      
                     </div>
                     <div className="mt-3 text-center sm:mt-5">
                       <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">

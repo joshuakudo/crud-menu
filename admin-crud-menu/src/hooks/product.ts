@@ -10,6 +10,10 @@ export const useAddProductSuccess = (): boolean => {
   return useSelector((state: AppState) => state.Product.addProductSuccess)
 }
 
-export const useProducts = (): ProductState['productInfo'] => {
+export const useProducts = (): ProductState['productInfos'] => {
+  return useSelector((state: AppState) => state.Product.productInfos)
+}
+
+export const useProduct = (): ProductState['productInfo'] => {
   return useSelector((state: AppState) => state.Product.productInfo)
 }

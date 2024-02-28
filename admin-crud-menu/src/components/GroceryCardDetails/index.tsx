@@ -1,35 +1,24 @@
 import { Fragment, useState } from "react";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { Popover, RadioGroup, Transition } from "@headlessui/react";
-import {
-  EllipsisHorizontalIcon,
-} from "@heroicons/react/24/outline";
+import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import { classNames } from "../../utitlities";
-import NumberPicker from "../NumberPicker";
 import Modal from "../Modal";
 import ModalConfirmation from "../ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 import ComingSoonImage from "../../assets/ComingSoon.png";
 
+import { useProduct } from "../../hooks/product";
+import { useDispatch } from "react-redux";
+import {
+  deleteProductRequest,
+  getProductDetailsRequest,
+} from "../../redux/product/action";
+import AddModalForm from "components/Form";
+
 const product = {
-  name: "Basic Tee",
-  price: "$35",
-  rating: 3.9,
+  rating: 5.0,
   reviewCount: 512,
-  href: "#",
-  breadcrumbs: [
-    { id: 1, name: "Women", href: "#" },
-    { id: 2, name: "Clothing", href: "#" },
-  ],
-  images: [
-    {
-      id: 1,
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/product-page-01-featured-product-shot.jpg",
-      imageAlt: "Back of women's Basic Tee in black.",
-      primary: true,
-    },
-  ],
   colors: [
     { name: "Black", bgColor: "bg-gray-900", selectedColor: "ring-gray-900" },
     {
@@ -38,36 +27,78 @@ const product = {
       selectedColor: "ring-gray-400",
     },
   ],
-  sizes: [
-    { name: "XXS", inStock: true },
-    { name: "XS", inStock: true },
-    { name: "S", inStock: true },
-    { name: "M", inStock: true },
-    { name: "L", inStock: true },
-    { name: "XL", inStock: false },
-  ],
-  description: `
-    <p>The Basic tee is an honest new take on a classic. The tee uses super soft, pre-shrunk cotton for true comfort and a dependable fit. They are hand cut and sewn locally, with a special dye technique that gives each tee it's own look.</p>
-    <p>Looking to stock your closet? The Basic tee also comes in a 3-pack or 5-pack at a bundle discount.</p>
-  `,
-  details: [
-    "Only the best materials",
-    "Ethically and locally made",
-    "Pre-washed and pre-shrunk",
-    "Machine wash cold with similar colors",
-  ],
 };
 
+interface IProps {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-export default function GroceryCardDetails() {
+const GroceryCardDetails: React.FC<IProps> = ({ setOpen }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const productDetails = useProduct();
+
+  const option = {
+    sizes: [
+      {
+        name: "S",
+        value: "smallStocks",
+        inStock: productDetails?.smallStocks! > 0,
+        stock: productDetails?.smallStocks,
+      },
+      {
+        name: "M",
+        value: "mediumStocks",
+        inStock: productDetails?.mediumStocks! > 0,
+        stock: productDetails?.mediumStocks,
+      },
+      {
+        name: "L",
+        value: "largeStocks",
+        inStock: productDetails?.largeStocks! > 0,
+        stock: productDetails?.largeStocks,
+      },
+    ],
+    capacities: [
+      {
+        name: "128GB",
+        value: "stocks128gbStorage",
+        inStock: productDetails?.stocks128gbStorage! > 0,
+        stock: productDetails?.stocks128gbStorage,
+      },
+      {
+        name: "256GB",
+        value: "stocks256gbStorage",
+        inStock: productDetails?.stocks256gbStorage! > 0,
+        stock: productDetails?.stocks256gbStorage,
+      },
+      {
+        name: "1TB",
+        value: "stocks1tbStorage",
+        inStock: productDetails?.stocks1tbStorage! > 0,
+        stock: productDetails?.stocks1tbStorage,
+      },
+    ],
+  };
+
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[2]);
-  const [open, setOpen] = useState<boolean>(false);
+  const [selectedOption, setSelectedOption] = useState(
+    productDetails.category === "apparel"
+      ? option.sizes[0]
+      : option.capacities[0]
+  );
+
+  const options =
+    productDetails.category !== "Gadget" ? option.sizes : option.capacities;
+
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [openModalOne, setOpenModalOne] = useState<boolean>(false);
+  const [addModal, setAddModal] = useState<boolean>(false);
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
-
-  const navigate = useNavigate();
+  const [stockLeft, setStockLeft] = useState<number>(
+    productDetails?.stocksLeft
+  );
 
   const handleClose = () => {
     setOpen(false);
@@ -85,15 +116,29 @@ export default function GroceryCardDetails() {
     setOpenModalOne(false);
   };
 
-  const handleDelete = () => {};
+  const handleDelete = () => {
+    console.log("key", productDetails.key);
+    dispatch(deleteProductRequest(productDetails.key));
+    setOpen(false);
+    setDeleteModal(false);
+  };
 
   const handleCloseDeleteModal = () => {
     setDeleteModal(false);
   };
 
   const handleUpdate = () => {
+    setAddModal(true);
+    dispatch(getProductDetailsRequest(productDetails.key));
+  };
 
-  }
+  const handleOptionClick = (option: {
+    name: string;
+    inStock: boolean;
+    stock: number | undefined;
+  }) => {
+    setStockLeft(option?.stock!);
+  };
 
   return (
     <>
@@ -127,6 +172,9 @@ export default function GroceryCardDetails() {
         onClose={handleCloseModalOne}
         callback={handleCloseModalOne}
       />
+
+      <AddModalForm open={addModal} setOpen={setAddModal} isUpdate />
+
       <div className="bg-white relative max-h-[1150px]">
         <div className="pb-16 pt-6 ">
           <div className="mx-auto mt-8 max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 rounded-lg">
@@ -161,6 +209,12 @@ export default function GroceryCardDetails() {
                           >
                             Delete
                           </button>
+                          <button
+                            onClick={handleClose}
+                            className="block py-1 mx-3 w-full text-lg text-left"
+                          >
+                            Close
+                          </button>
                         </div>
                       </Popover.Panel>
                     </Transition>
@@ -168,10 +222,10 @@ export default function GroceryCardDetails() {
                 </div>
                 <div className="flex justify-between">
                   <h1 className="text-xl font-medium text-gray-900">
-                    {product.name}
+                    {productDetails.name}
                   </h1>
                   <p className="text-xl font-medium text-gray-900">
-                    {product.price}
+                    ₱ {productDetails.price}
                   </p>
                 </div>
                 {/* Reviews */}
@@ -217,23 +271,15 @@ export default function GroceryCardDetails() {
               </div>
 
               {/* Image gallery */}
-              <div className="mt-8 lg:col-span-7 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:mt-0">
+              <div className="mt-8 lg:col-span-7 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:mt-0">
                 <h2 className="sr-only">Images</h2>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 lg:gap-8">
-                  {product.images.map((image) => (
-                    <img
-                      key={image.id}
-                      src={image.imageSrc}
-                      alt={image.imageAlt}
-                      className={classNames(
-                        image.primary
-                          ? "lg:col-span-2 lg:row-span-2"
-                          : "hidden lg:block",
-                        "rounded-lg"
-                      )}
-                    />
-                  ))}
+                <div className=" w-full mx-10">
+                  <img
+                    src={productDetails.files}
+                    alt="product"
+                    className="h-full w-full object-center object-contain lg:h-[45rem] lg:w-[30rem]"
+                  />
                 </div>
               </div>
 
@@ -283,33 +329,44 @@ export default function GroceryCardDetails() {
                 {/* Size picker */}
                 <div className="mt-8">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-medium text-gray-900">Size</h2>
-                    <div
-                      onClick={() => {
-                        setOpenModalOne(true);
-                      }}
-                      className="text-lg font-medium text-emerald-900 hover:text-emerald-950"
-                    >
-                      See sizing chart
-                    </div>
+                    <h2 className="text-lg font-medium text-gray-900">
+                      Options
+                    </h2>
+                    {productDetails.category === "Gadget" ? (
+                      ""
+                    ) : (
+                      <>
+                        <div
+                          onClick={() => {
+                            setOpenModalOne(true);
+                          }}
+                          className="text-lg font-medium text-emerald-900 hover:text-emerald-950"
+                        >
+                          See sizing chart
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <RadioGroup
-                    value={selectedSize}
-                    onChange={setSelectedSize}
+                    value={selectedOption}
+                    onChange={(option) => {
+                      setSelectedOption(option);
+                      handleOptionClick(option); // Call your specific function here
+                    }}
                     className="mt-2"
                   >
                     <RadioGroup.Label className="sr-only">
-                      Choose a size
+                      Choose an option
                     </RadioGroup.Label>
                     <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-                      {product.sizes.map((size) => (
+                      {options.map((option) => (
                         <RadioGroup.Option
-                          key={size.name}
-                          value={size}
+                          key={option.name}
+                          value={option}
                           className={({ active, checked }) =>
                             classNames(
-                              size.inStock
+                              option.inStock
                                 ? "cursor-pointer focus:outline-none"
                                 : "cursor-not-allowed opacity-25",
                               active
@@ -321,10 +378,10 @@ export default function GroceryCardDetails() {
                               "flex items-center justify-center rounded-md border py-3 px-3 text-lg font-medium uppercase sm:flex-1"
                             )
                           }
-                          disabled={!size.inStock}
+                          disabled={!option.inStock}
                         >
                           <RadioGroup.Label as="span">
-                            {size.name}
+                            {option.name}
                           </RadioGroup.Label>
                         </RadioGroup.Option>
                       ))}
@@ -334,11 +391,14 @@ export default function GroceryCardDetails() {
                 <h2 className="text-lg mt-5 font-medium text-gray-900">
                   Stocks Left
                 </h2>
-                <NumberPicker />
+
+                <h2 className="text-lg mt-5 text-gray-900">{stockLeft} pc/s</h2>
 
                 <h2 className="text-lg mt-5 font-medium text-gray-900">Cost</h2>
 
-                <h2 className="text-lg mt-5 text-gray-900">$20</h2>
+                <h2 className="text-lg mt-5 text-gray-900">
+                  ₱ {productDetails.cost}
+                </h2>
 
                 <button
                   onClick={handleUpdate}
@@ -355,7 +415,9 @@ export default function GroceryCardDetails() {
 
                   <div
                     className="prose prose-sm mt-4 text-gray-500"
-                    dangerouslySetInnerHTML={{ __html: product.description }}
+                    dangerouslySetInnerHTML={{
+                      __html: productDetails.description,
+                    }}
                   />
                 </div>
               </div>
@@ -365,4 +427,6 @@ export default function GroceryCardDetails() {
       </div>
     </>
   );
-}
+};
+
+export default GroceryCardDetails;

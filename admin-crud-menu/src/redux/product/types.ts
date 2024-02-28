@@ -5,11 +5,28 @@ export type ProductState = typeof initialState;
 
 export const initialState = {
 	loading: false,
+	authenticated: false,
+	unathorized: false,
 	addProductSuccess: false,
 	updateProductSuccess: false,
 	productInfos: [] as Product[],
 	productInfo: {} as Product 
 }
+
+export const SIGNIN = "SIGNIN";
+export const SIGNIN_REQUEST = "SIGNIN_REQUEST";
+export const SIGNIN_SUCCESS = "SIGNIN_SUCCESS";
+export const SIGNIN_FAILED = "SIGNIN_FAILED";
+
+export const SIGNOUT = "SIGNOUT";
+export const SIGNOUT_REQUEST = "SIGNOUT_REQUEST";
+export const SIGNOUT_SUCCESS = "SIGNOUT_SUCCESS";
+export const SIGNOUT_FAILED = "SIGNOUT_FAILED";
+
+export const UNAUTHORIZED = "UNAUTHORIZED";
+export const UNAUTHORIZED_REQUEST = "UNAUTHORIZED_REQUEST";
+export const UNAUTHORIZED_SUCCESS = "UNAUTHORIZED_SUCCESS";
+export const UNAUTHORIZED_FAILED = "UNAUTHORIZED_FAILED";
 
 export const GET_PRODUCTS = "GET_PRODUCTS"
 export const GET_PRODUCTS_REQUEST = "GET_PRODUCTS_REQUEST"
@@ -42,6 +59,16 @@ export const DELETE_PRODUCT_SUCCESS = "DELETE_PRODUCT_SUCCESS"
 export const DELETE_PRODUCT_FAILED = "DELETE_PRODUCT_FAILED"
 
 //Payload
+
+export interface SignInPayload {
+  email?: string;
+  password?: string;
+}
+
+export interface SignOutPayload {
+  path?: string;
+}
+
 export interface GetProductsPayload extends Product {}
 
 export interface AddProductPayload {
@@ -55,15 +82,47 @@ export interface AddProductPayload {
 	mediumStocks?: number,
 	largeStocks?: number,
 	files: string,
+	stocks128gbStorage?: number,
+	stocks256gbStorage?: number,
+	stocks1tbStorage?: number,
+}
+
+export interface UpdateProductPayload {
+	key: string
+	updatedFields: Partial<Product>
 }
 
 //Action
+export type SignInAction = {
+  type: typeof SIGNIN_REQUEST;
+  payload: SignInPayload;
+};
+
 export type AddProductAction = {
 	type: typeof ADD_PRODUCT_REQUEST
 	payload: AddProductPayload
 }
 
-export type GetProductAction = {
-	type: typeof GET_PRODUCT_REQUEST
+export type GetProductsAction = {
+	type: typeof GET_PRODUCTS_REQUEST
 }
 
+export type GetProductDetailsAction = {
+	type: typeof GET_PRODUCT_DETAILS_REQUEST
+	payload: string
+}
+
+export type DeleteProductAction = {
+	type: typeof DELETE_PRODUCT_REQUEST
+	payload: string
+}
+
+export type UpdateProductAction = {
+	type: typeof UPDATE_PRODUCT_REQUEST
+	payload: UpdateProductPayload
+}
+
+export type SignOutAction = {
+  type: typeof SIGNOUT_REQUEST;
+  payload: SignOutPayload;
+};

@@ -14,6 +14,7 @@ interface ToastProps {
 
 export const SuccessToast: React.FC<ToastProps> = ({ title, message, linkObj, closeToast }) => {
   const navigate = useNavigate();
+  console.log('I popped')
   return (
     <>
       <div className="flex items-start z-50">
