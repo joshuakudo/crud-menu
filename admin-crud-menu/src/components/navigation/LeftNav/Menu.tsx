@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { INavigation } from ".";
-import { classNames } from "../../../utitlities";
+import { classNames } from "../../../utilities";
 
 export interface IMenu {
   item: INavigation;

@@ -1,27 +1,18 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import SelectOption from '../../../../components/SelectOption';
-import { useDebounceEffect, useUpdateEffect } from '../../../../hooks';
-import { Combobox } from '@headlessui/react';
+import { useDebounceEffect } from '../../../../hooks';
+
 import { ISelectOption } from '../../../../interface/common';
 
 interface IProps extends JSX.IntrinsicAttributes {
   setSearch: React.Dispatch<React.SetStateAction<string>>
   handleSearch?: () => void
   filterBy?: ISelectOption[]
-  setFilterBy: React.Dispatch<React.SetStateAction<ISelectOption>>
-  selectedFilter?: ISelectOption
-  setSelectedSubFilter?: React.Dispatch<React.SetStateAction<ISelectOption>>
-  callback?: (inputValue: string, page: number, prevOptions: ISelectOption[]) => Promise<ISelectOption[]>;
-  isLastPage?: boolean;
-  setStartDate?: React.Dispatch<React.SetStateAction<Date | ''>>
-  setEndDate?: React.Dispatch<React.SetStateAction<Date | ''>>
-  className?: string
-  search: string
+  search?: string
 }
 
-const Header: React.FC<IProps> = ({ search, className, isLastPage, callback, setSearch, handleSearch, filterBy, selectedFilter, setFilterBy, setSelectedSubFilter, setStartDate, setEndDate }) => {
-  const [hideSubFilter, setHideSubFilter] = useState<boolean>(false);
+const Header: React.FC<IProps> = ({ search,  setSearch, handleSearch, filterBy}) => {
 
   const handleOnChage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVal = e.target.value;

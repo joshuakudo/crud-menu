@@ -2,7 +2,7 @@ import { Fragment, useState } from "react";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { Popover, RadioGroup, Transition } from "@headlessui/react";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
-import { classNames } from "../../utitlities";
+import { classNames } from "../../utilities";
 import Modal from "../Modal";
 import ModalConfirmation from "../ModalConfirmation";
 import { useNavigate } from "react-router-dom";
