@@ -23,7 +23,7 @@ const SelectOption: React.FC<Props> = ({ defaultValue, options, onChange, setSel
     <>
       <Select
         key={selectOption?.key}
-        value={selectOption ? selectOption.value : ''}
+        value={selectOption ? selectOption.value : 'All'}
         onChange={handleChange}
         style={{ width: '200px', color: 'black' }} 
       >

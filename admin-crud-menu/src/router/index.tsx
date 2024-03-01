@@ -16,7 +16,7 @@ const AppRoutes = () => {
       <Route element={<PrivateRoute />}>
         <Route element={<PrimaryLayout />}>
           <Route index path="/dashboard" element={<ComingSoon />} />
-          <Route index path="/product" element={<Product />} />
+          <Route index path="/menu" element={<Product />} />
 
           <Route index path="/analytics" element={<ComingSoon />} />
           <Route index path="/sale" element={<ComingSoon />} />

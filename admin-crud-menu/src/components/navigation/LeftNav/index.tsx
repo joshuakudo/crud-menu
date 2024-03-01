@@ -13,6 +13,7 @@ import { useState } from "react";
 import ModalConfirmation from "components/ModalConfirmation";
 import { useDispatch } from "react-redux";
 import { signoutRequest } from "../../../redux/product/action";
+import { IoFastFood } from "react-icons/io5";
 
 export interface INavigationChildren {
   name: string;
@@ -40,11 +41,11 @@ const Sidebar = () => {
       href: "/dashboard",
     },
     {
-      name: "Product",
-      icon: ShoppingCartIcon as React.ComponentType<
+      name: "Menu",
+      icon: IoFastFood as React.ComponentType<
         React.SVGProps<SVGSVGElement>
       >,
-      href: "/product",
+      href: "/menu",
     },
     {
       name: "Analytics",

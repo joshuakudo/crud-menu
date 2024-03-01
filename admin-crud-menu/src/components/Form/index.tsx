@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { FileRejection, useDropzone } from "react-dropzone";
 import SelectOption from "../SelectOption";
 import { addProductRequest, updateProductRequest } from "../../redux/product/action";
-import { useAddProductSuccess, useProduct } from "hooks/product";
+import { useAddProductSuccess, useProduct, useUpdateProductSuccess } from "hooks/product";
 import { ISelectOption } from "interface/common";
 import {
   getDownloadURL,
@@ -29,23 +29,20 @@ interface IProps {
 }
 
 export const FilterOptions = [
-  { key: 0, value: "Gadget", label: "Gadget" },
-  { key: 1, value: "Apparel", label: "Apparel" },
+  { key: 0, value: "Breakfast", label: "Breakfast" },
+  { key: 1, value: "Lunch", label: "Lunch" },
   { key: 2, value: "Snacks", label: "Snacks" },
-  { key: 3, value: "Dairy", label: "Dairy" },
-  { key: 4, value: "Canned", label: "Canned foods" },
-  { key: 5, value: "Hygiene", label: "Hygiene" },
-  { key: 6, value: "Frozen", label: "Frozen Foods" },
-  { key: 7, value: "Vegetable", label: "Vegetables" },
-  { key: 8, value: "Fruit", label: "Fruits" },
-  { key: 9, value: "Condiment", label: "Condiments" },
-  { key: 10, value: "Meat", label: "Meat" },
-  { key: 11, value: "Other", label: "Other" },
+  { key: 3, value: "Dinner", label: "Dinner" },
+  { key: 4, value: "Beverages", label: "Beverages" },
+  { key: 5, value: "Dessert", label: "Dessert" },
+  { key: 6, value: "Fruit", label: "Fruits" },
+  { key: 7, value: "Other", label: "Other" },
 ];
 
 const AddModalForm: React.FC<IProps> = ({ open, setOpen, isUpdate }) => {
   const dispatch = useDispatch();
   const addProductSuccess = useAddProductSuccess();
+  const updateProductSuccess = useUpdateProductSuccess()
   const [fileValue, setFileValue] = useState<File[]>();
   const [fileError, setFileError] = useState<string>("");
 
@@ -93,9 +90,6 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen, isUpdate }) => {
     stocksLeft: isUpdate ? product.stocksLeft : 0,
     cost: isUpdate ? product.cost : 0,
     price: isUpdate ? product.price : 0,
-    stocks128gbStorage: isUpdate ? product.stocks128gbStorage :0,
-    stocks256gbStorage: isUpdate ? product.stocks256gbStorage :0,
-    stocks1tbStorage: isUpdate ? product.stocks1tbStorage :0,
     smallStocks: isUpdate ? product.smallStocks :0,
     mediumStocks: isUpdate ? product.mediumStocks : 0,
     largeStocks: isUpdate ? product.largeStocks :0,
@@ -143,9 +137,6 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen, isUpdate }) => {
           smallStocks: values.smallStocks,
           mediumStocks: values.mediumStocks,
           largeStocks: values.largeStocks,
-          stocks128gbStorage: values.stocks128gbStorage,
-          stocks256gbStorage: values.stocks256gbStorage,
-          stocks1tbStorage: values.stocks1tbStorage,
           files: image === "" ? product.files : image,
         }
         dispatch(updateProductRequest({
@@ -165,9 +156,6 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen, isUpdate }) => {
               smallStocks: values.smallStocks,
               mediumStocks: values.mediumStocks,
               largeStocks: values.largeStocks,
-              stocks128gbStorage: values.stocks128gbStorage,
-              stocks256gbStorage: values.stocks256gbStorage,
-              stocks1tbStorage: values.stocks1tbStorage,
               files: image,
             })
           );
@@ -175,14 +163,18 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen, isUpdate }) => {
   
       }
       
-      if (addProductSuccess) {
-        setOpen(false);
-      }
     } catch (error) {
       console.error("Error handling form submission:", error);
       // Handle the error as needed
     }
   };
+  console.log('addProductSuccess', addProductSuccess)
+
+  useEffect(() => {
+    if (addProductSuccess || updateProductSuccess) {
+      setOpen(false);
+    }
+  },[addProductSuccess, updateProductSuccess])
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
@@ -261,7 +253,7 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen, isUpdate }) => {
                   onSubmit={handleSubmit}
                   validationSchema={validationSchema}
                 >
-                  {({ errors, touched, isValid, values, setFieldValue }) => (
+                  {({ setFieldValue }) => (
                     <Form>
                       <div className="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
                         <button
@@ -279,7 +271,7 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen, isUpdate }) => {
                             as="h3"
                             className="text-2xl font-medium leading-6 text-gray-900"
                           >
-                            Add Product
+                            Add Menu
                           </Dialog.Title>
                           <div className="mt-10 mb-4 w-full">
                             <div>
@@ -287,14 +279,14 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen, isUpdate }) => {
                                 htmlFor="name"
                                 className="block text-lg font-medium text-black"
                               >
-                                Product Name
+                                Menu Name
                               </label>
                               <div className="mt-1 w-full">
                                 <Field
                                   type="text"
                                   name="name"
                                   id="name"
-                                  className="block w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-emerald-900 focus:ring-emerald-900 sm:text-lg"
+                                  className="block pl-3 w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-emerald-900 focus:ring-emerald-900 sm:text-lg"
                                   placeholder="Name..."
                                 />
                                 <ErrorMessage
@@ -383,21 +375,21 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen, isUpdate }) => {
                             <div className="flex">
                               <div className="mb-4 mr-4">
                                 <label
-                                  htmlFor={selectOption?.value === "Gadget" ? "stocks128gbStorage" : "smallStocks"}
+                                  htmlFor="smallStocks"
                                   className="block text-lg font-medium text-black"
                                 >
-                                  {selectOption?.value === "Gadget" ? "Stocks of 128GB Storage" : "Small Size Stocks"}
+                                  Small Servings Left
                                 </label>
                                 <div className="mt-1 w-full relative">
                                   <Field
                                     type="number"
-                                    name={selectOption?.value === "Gadget" ? "stocks128gbStorage" : "smallStocks"}
-                                    id={selectOption?.value === "Gadget" ? "stocks128gbStorage" : "smallStocks"}
+                                    name="smallStocks"
+                                    id="smallStocks"
                                     className="block pl-3 w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-emerald-900 focus:ring-emerald-900 sm:text-lg"
                                     placeholder="Enter the stocks amount..."
                                   />
                                   <ErrorMessage
-                                    name={selectOption?.value === "Gadget" ? "stocks128gbStorage" : "smallStocks"}
+                                    name="smallStocks"
                                     component="div"
                                     className="mt-1 block text-sm font-bold text-red-500"
                                   />
@@ -406,21 +398,21 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen, isUpdate }) => {
 
                               <div className="mb-4 mr-4">
                                 <label
-                                  htmlFor={selectOption?.value === "Gadget" ? "stocks256gbStorage" : "mediumStocks"}
+                                  htmlFor="mediumStocks"
                                   className="block text-lg font-medium text-black"
                                 >
-                                  {selectOption?.value === "Gadget" ? "Stocks of 256GB Storage" : "Medium Size Stocks"}
+                                  Medium Servings Left
                                 </label>
                                 <div className="mt-1 w-full relative">
                                   <Field
                                     type="number"
-                                    name={selectOption?.value === "Gadget" ? "stocks256gbStorage" : "mediumStocks"}
-                                    id={selectOption?.value === "Gadget" ? "stocks256gbStorage" : "mediumStocks"}
+                                    name="mediumStocks"
+                                    id="mediumStocks"
                                     className="block pl-3 w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-emerald-900 focus:ring-emerald-900 sm:text-lg"
                                     placeholder="Enter the stocks amount..."
                                   />
                                   <ErrorMessage
-                                    name={selectOption?.value === "Gadget" ? "stocks256gbStorage" : "mediumStocks"}
+                                    name="mediumStocks"
                                     component="div"
                                     className="mt-1 block text-sm font-bold text-red-500"
                                   />
@@ -429,22 +421,22 @@ const AddModalForm: React.FC<IProps> = ({ open, setOpen, isUpdate }) => {
 
                               <div className="mb-4">
                                 <label
-                                  htmlFor={selectOption?.value === "Gadget" ? "stocks1tbStorage" : "largeStocks"}
+                                  htmlFor="largeStocks"
                                   className="block text-lg font-medium text-black"
                                 >
-                                  {selectOption?.value === "Gadget" ? "Stocks of 1TB Storage" : "Large Size Stocks"}
+                                  Large Servings Left
                                   
                                 </label>
                                 <div className="mt-1 w-full relative">
                                   <Field
                                     type="number"
-                                    name={selectOption?.value === "Gadget" ? "stocks1tbStorage" : "largeStocks"}
-                                    id={selectOption?.value === "Gadget" ? "stocks1tbStorage" : "largeStocks"}
+                                    name="largeStocks"
+                                    id="largeStocks"
                                     className="block w-full pl-3 h-10 rounded-md border-gray-300 shadow-sm focus:border-emerald-900 focus:ring-emerald-900 sm:text-lg"
                                     placeholder="Enter the stocks amount..."
                                   />
                                   <ErrorMessage
-                                    name={selectOption?.value === "Gadget" ? "stocks1tbStorage" : "largeStocks"}
+                                    name="largeStocks"
                                     component="div"
                                     className="mt-1 block text-sm font-bold text-red-500"
                                   />

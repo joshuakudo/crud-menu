@@ -27,7 +27,7 @@ const Signin = () => {
 
   useEffect(() => {
     if (auth){
-      navigate('/product')
+      navigate('/menu')
     } else {
       dispatch(signoutRequest({ path: '/' }))
     }

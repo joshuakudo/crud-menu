@@ -11,13 +11,13 @@ interface IProps {
   item: Product | null;
 }
 
-const Card: React.FC<IProps> = ({item}) => {
+const Card: React.FC<IProps> = ({ item }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handleClick = () => {
-    dispatch(getProductDetailsRequest(item?.key!))
+    dispatch(getProductDetailsRequest(item?.key!));
     setOpen(true);
   };
 
@@ -39,7 +39,9 @@ const Card: React.FC<IProps> = ({item}) => {
         <div className="p-6">
           <div className="flex items-center justify-between mb-3">
             <h5 className="block font-sans text-xl antialiased font-medium leading-snug tracking-normal text-blue-gray-900">
-              {item?.name}
+              {item?.name && item?.name.length > 100
+              ? `${item.description.slice(0, 80)}...`
+              : item?.name}
             </h5>
             <p className="flex items-center gap-1.5 font-sans text-base font-normal leading-relaxed text-blue-gray-900 antialiased">
               <StarIcon className="text-yellow-600 h-5 w-5" />
@@ -47,18 +49,20 @@ const Card: React.FC<IProps> = ({item}) => {
             </p>
           </div>
           <p className="block font-sans text-base antialiased font-light leading-relaxed text-gray-700">
-            {item?.description}
+            {item?.description && item.description.length > 100
+              ? `${item.description.slice(0, 80)}...`
+              : item?.description}
           </p>
         </div>
         <div className="p-6 pt-3">
-          <div className="flex bottom-5 inset-x-auto">
-          <button
-            className="block w-full select-none rounded-lg bg-emerald-900 py-3.5 px-10 text-center align-middle font-sans text-sm font-bold uppercase text-white shadow-md shadow-gray-900/10 transition-all hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-            onClick={handleClick}
-            type="button"
-          >
-            View Details
-          </button>
+          <div className="flex absolute bottom-5 inset-x-5">
+            <button
+              className="block w-full select-none rounded-lg bg-emerald-900 py-3.5 px-10 text-center align-middle font-sans text-sm font-bold uppercase text-white shadow-md shadow-gray-900/10 transition-all hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+              onClick={handleClick}
+              type="button"
+            >
+              View Details
+            </button>
           </div>
 
           <Transition show={open} as={Fragment}>
@@ -81,7 +85,7 @@ const Card: React.FC<IProps> = ({item}) => {
                 >
                   <div className="bg-white rounded-lg m-10">
                     {/* ... rest of your card content */}
-                    {open && <GroceryCardDetails setOpen={setOpen}/>}
+                    {open && <GroceryCardDetails setOpen={setOpen} />}
                   </div>
                 </Transition.Child>
               </div>

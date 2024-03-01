@@ -19,14 +19,6 @@ import AddModalForm from "components/Form";
 const product = {
   rating: 5.0,
   reviewCount: 512,
-  colors: [
-    { name: "Black", bgColor: "bg-gray-900", selectedColor: "ring-gray-900" },
-    {
-      name: "Heather Grey",
-      bgColor: "bg-gray-400",
-      selectedColor: "ring-gray-400",
-    },
-  ],
 };
 
 interface IProps {
@@ -39,7 +31,7 @@ const GroceryCardDetails: React.FC<IProps> = ({ setOpen }) => {
 
   const productDetails = useProduct();
 
-  const option = {
+  const options = {
     sizes: [
       {
         name: "S",
@@ -60,37 +52,9 @@ const GroceryCardDetails: React.FC<IProps> = ({ setOpen }) => {
         stock: productDetails?.largeStocks,
       },
     ],
-    capacities: [
-      {
-        name: "128GB",
-        value: "stocks128gbStorage",
-        inStock: productDetails?.stocks128gbStorage! > 0,
-        stock: productDetails?.stocks128gbStorage,
-      },
-      {
-        name: "256GB",
-        value: "stocks256gbStorage",
-        inStock: productDetails?.stocks256gbStorage! > 0,
-        stock: productDetails?.stocks256gbStorage,
-      },
-      {
-        name: "1TB",
-        value: "stocks1tbStorage",
-        inStock: productDetails?.stocks1tbStorage! > 0,
-        stock: productDetails?.stocks1tbStorage,
-      },
-    ],
   };
 
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
-  const [selectedOption, setSelectedOption] = useState(
-    productDetails.category === "apparel"
-      ? option.sizes[0]
-      : option.capacities[0]
-  );
-
-  const options =
-    productDetails.category !== "Gadget" ? option.sizes : option.capacities;
+  const [selectedOption, setSelectedOption] = useState(options.sizes[0]);
 
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [openModalOne, setOpenModalOne] = useState<boolean>(false);
@@ -132,12 +96,12 @@ const GroceryCardDetails: React.FC<IProps> = ({ setOpen }) => {
     dispatch(getProductDetailsRequest(productDetails.key));
   };
 
-  const handleOptionClick = (option: {
+  const handleOptionClick = (options: {
     name: string;
     inStock: boolean;
     stock: number | undefined;
   }) => {
-    setStockLeft(option?.stock!);
+    setStockLeft(options?.stock!);
   };
 
   return (
@@ -284,47 +248,6 @@ const GroceryCardDetails: React.FC<IProps> = ({ setOpen }) => {
               </div>
 
               <div className="mt-8 lg:col-span-5">
-                {/* Color picker */}
-                <div>
-                  <h2 className="text-lg font-medium text-gray-900">Color</h2>
-
-                  <RadioGroup
-                    value={selectedColor}
-                    onChange={setSelectedColor}
-                    className="mt-2"
-                  >
-                    <RadioGroup.Label className="sr-only">
-                      Choose a color
-                    </RadioGroup.Label>
-                    <div className="flex items-center space-x-3">
-                      {product.colors.map((color) => (
-                        <RadioGroup.Option
-                          key={color.name}
-                          value={color}
-                          className={({ active, checked }) =>
-                            classNames(
-                              color.selectedColor,
-                              active && checked ? "ring ring-offset-1" : "",
-                              !active && checked ? "ring-2" : "",
-                              "relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-none"
-                            )
-                          }
-                        >
-                          <RadioGroup.Label as="span" className="sr-only">
-                            {color.name}
-                          </RadioGroup.Label>
-                          <span
-                            aria-hidden="true"
-                            className={classNames(
-                              color.bgColor,
-                              "h-8 w-8 rounded-full border border-black border-opacity-10"
-                            )}
-                          />
-                        </RadioGroup.Option>
-                      ))}
-                    </div>
-                  </RadioGroup>
-                </div>
 
                 {/* Size picker */}
                 <div className="mt-8">
@@ -332,20 +255,6 @@ const GroceryCardDetails: React.FC<IProps> = ({ setOpen }) => {
                     <h2 className="text-lg font-medium text-gray-900">
                       Options
                     </h2>
-                    {productDetails.category === "Gadget" ? (
-                      ""
-                    ) : (
-                      <>
-                        <div
-                          onClick={() => {
-                            setOpenModalOne(true);
-                          }}
-                          className="text-lg font-medium text-emerald-900 hover:text-emerald-950"
-                        >
-                          See sizing chart
-                        </div>
-                      </>
-                    )}
                   </div>
 
                   <RadioGroup
@@ -360,7 +269,7 @@ const GroceryCardDetails: React.FC<IProps> = ({ setOpen }) => {
                       Choose an option
                     </RadioGroup.Label>
                     <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-                      {options.map((option) => (
+                      {options?.sizes.map((option) => (
                         <RadioGroup.Option
                           key={option.name}
                           value={option}
@@ -389,7 +298,7 @@ const GroceryCardDetails: React.FC<IProps> = ({ setOpen }) => {
                   </RadioGroup>
                 </div>
                 <h2 className="text-lg mt-5 font-medium text-gray-900">
-                  Stocks Left
+                  Servings Left
                 </h2>
 
                 <h2 className="text-lg mt-5 text-gray-900">{stockLeft} pc/s</h2>

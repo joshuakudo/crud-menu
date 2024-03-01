@@ -15,8 +15,5 @@ export interface Product {
   smallStocks?: number
   mediumStocks?: number
   largeStocks?: number
-  stocks128gbStorage?: number
-  stocks256gbStorage?: number
-  stocks1tbStorage?: number
   files: string
 }

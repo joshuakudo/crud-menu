@@ -28,6 +28,7 @@ const userReducer = (
       return {
         ...state,
         loading: true,
+        addProductSuccess: false
       };
     case types.ADD_PRODUCT_SUCCESS:
       return {
@@ -75,11 +76,17 @@ const userReducer = (
         ...state,
         loading: false,
       };
-
+      case types.UPDATE_PRODUCT_REQUEST:
+        return {
+          ...state,
+          loading: true,
+          addProductSuccess: false,
+        };
     case types.UPDATE_PRODUCT_SUCCESS:
       return {
         ...state,
         loading: false,
+        updateProductSuccess: true,
         productInfos: state.productInfos?.map((product) =>
           product.key === action.payload.key
             ? { ...product, ...action.payload.updatedFields }

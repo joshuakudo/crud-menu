@@ -47,8 +47,8 @@ function* SignOut({ payload }: types.SignOutAction) {
 function* AddProduct({payload}: types.AddProductAction) {
   try {
     const db = getDatabase(app)
-    const newDocRef = push(ref(db,"product"))
-
+    const newDocRef = push(ref(db,"menu"))
+    console.log(app)
     yield put({
       type: types.ADD_PRODUCT_SUCCESS,
       payload: set(newDocRef, {
@@ -61,9 +61,6 @@ function* AddProduct({payload}: types.AddProductAction) {
         smallStocks: payload.smallStocks,
         mediumStocks: payload.mediumStocks,
         largeStocks: payload.largeStocks,
-        stocks128gbStorage: payload.stocks128gbStorage,
-        stocks256gbStorage: payload.stocks256gbStorage,
-        stocks1tbStorage: payload.stocks1tbStorage,
         files: payload.files
       })
     })
@@ -82,7 +79,7 @@ function* AddProduct({payload}: types.AddProductAction) {
 function* GetProducts(): Generator<Effect, void, any> {
   try {
     const db = getDatabase(app);
-    const dbRef = ref(db, 'product');
+    const dbRef = ref(db, 'menu');
     const snapshot = yield call(get, dbRef);
 
     if (snapshot.exists()) {
@@ -123,7 +120,7 @@ function* GetProducts(): Generator<Effect, void, any> {
 function* GetProductDetais({ payload }: types.GetProductDetailsAction): Generator<Effect, void, any> {
   try {
     const db = getDatabase(app);
-    const specificProductRef = ref(db, `product/${payload}`);
+    const specificProductRef = ref(db, `menu/${payload}`);
     const snapshot = yield call(get, specificProductRef);
 
     if (snapshot.exists()) {
@@ -155,7 +152,7 @@ function* GetProductDetais({ payload }: types.GetProductDetailsAction): Generato
 function* DeleteProduct({payload}: types.DeleteProductAction): Generator<Effect, void, any> {
   try {
     const db = getDatabase(app);
-    const specificProductRef = ref(db, `product/${payload}`);
+    const specificProductRef = ref(db, `menu/${payload}`);
 
     yield call(remove, specificProductRef);
 
@@ -176,7 +173,7 @@ function* UpdateProduct({ payload }: types.UpdateProductAction): Generator<Effec
     const { key, updatedFields } = payload;
 
     const db = getDatabase(app);
-    const specificProductRef = ref(db, `product/${key}`);
+    const specificProductRef = ref(db, `menu/${key}`);
 
     // Update the specific product with the new values
     yield call(update, specificProductRef, updatedFields);
