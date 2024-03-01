@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import SelectOption from '../../../../components/SelectOption';
 import { useDebounceEffect } from '../../../../hooks';
@@ -9,7 +9,8 @@ interface IProps extends JSX.IntrinsicAttributes {
   setSearch: React.Dispatch<React.SetStateAction<string>>
   handleSearch?: () => void
   filterBy?: ISelectOption[]
-  search?: string
+  setFilterBy: React.Dispatch<React.SetStateAction<ISelectOption>>
+  search: string
 }
 
 const Header: React.FC<IProps> = ({ search,  setSearch, handleSearch, filterBy}) => {
